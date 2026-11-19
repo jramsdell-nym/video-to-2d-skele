@@ -1,0 +1,25 @@
+{
+  "complete": true,
+  "platform": "Darwin",
+  "architecture": "arm64",
+  "python": "3.13.14",
+  "device": "cpu",
+  "frames": 3,
+  "allOverlayFramesDecoded": true,
+  "allJSONTimestampsVerified": true,
+  "allOverlayTimestampsVerified": true,
+  "irregularSourceTimestamps": true,
+  "packageChecksumsPassed": true,
+  "usedPackageLocalModels": true,
+  "historicalRepositoryOnPythonPath": false,
+  "runtimeDependencies": "Installed pinned dependencies; no fresh network installation tested",
+  "testedFiles": {
+    "predict.py": "0ac0836791022b97cd478bd8063a5f0dc2077776a9604a337c8f4e965ba5f76d",
+    "batting/__init__.py": "472f30f18619fd30fa1c67e675f168516f4770dba0b906a8fa80ec781fecc750",
+    "batting/video.py": "27335cb622eaf673568fae7d1990d5e11b32b7bb558c4d37e6ef6dfa2de78a69",
+    "batting/tracking.py": "fc239c6fc3028ec154245a9e08ceff006c94124e0b3fbc53e50f5029ff1e9bdb",
+    "models/body.pt": "fa80b11aa862d76523291fe44868cc86318848bbab2340594a2b760b3112bd91",
+    "models/bat.pt": "2e836459b3907066bb58a24e86dac0f9f453003650f4a6a16d38518c7bf5f7f4",
+    "models/manifest.json": "b0b7909fff3d8e69cb3f1b46f7cc8014f1425160a760100cfa374da7d30d1bbc"
+  }
+}

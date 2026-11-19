@@ -1,0 +1,81 @@
+{
+  "scope": "Numerical export parity, not pose accuracy",
+  "versions": {
+    "ultralytics": "8.4.208",
+    "torch": "2.15.0",
+    "torchvision": "0.29.2",
+    "numpy": "2.5.4",
+    "opencv-python": "5.0.0.93",
+    "av": "19.0.2",
+    "Pillow": "13.0.0",
+    "onnx": "1.18.0",
+    "onnxruntime": "1.22.0"
+  },
+  "sampleSelection": "Three frozen private samples per evaluation video; five videos",
+  "models": {
+    "body": {
+      "checkpointSanitization": {
+        "stateTensorsIdentical": true,
+        "tensorCount": 541,
+        "sourceCheckpointSHA256": "a8ad88dcaff111e5615766c672601f978554d694125a0f9605144c1185519b05",
+        "packagedCheckpointSHA256": "fa80b11aa862d76523291fe44868cc86318848bbab2340594a2b760b3112bd91"
+      },
+      "inputShape": [
+        1,
+        3,
+        640,
+        640
+      ],
+      "outputShape": [
+        1,
+        56,
+        8400
+      ],
+      "inputName": "images",
+      "outputName": "output0",
+      "samples": 15,
+      "videos": 5,
+      "topCandidateMismatches": 0,
+      "maxSourceVersusSanitizedRawError": 0.0,
+      "maxSelectedSourcePixelError": 0.000274658203125,
+      "maxSelectedConfidenceError": 1.1920928955078125e-07,
+      "maxAllOutputAbsError": 0.0093994140625,
+      "opset": 17,
+      "precision": "FP32",
+      "dynamic": false,
+      "nms": false
+    },
+    "bat": {
+      "checkpointSanitization": {
+        "stateTensorsIdentical": true,
+        "tensorCount": 541,
+        "sourceCheckpointSHA256": "851abf87d0f506baa1eb55c5c8b5fb04dcd7ce098eede908005d1a9f468cdcba",
+        "packagedCheckpointSHA256": "2e836459b3907066bb58a24e86dac0f9f453003650f4a6a16d38518c7bf5f7f4"
+      },
+      "inputShape": [
+        1,
+        3,
+        768,
+        768
+      ],
+      "outputShape": [
+        1,
+        11,
+        12096
+      ],
+      "inputName": "images",
+      "outputName": "output0",
+      "samples": 15,
+      "videos": 5,
+      "topCandidateMismatches": 0,
+      "maxSourceVersusSanitizedRawError": 0.0,
+      "maxSelectedSourcePixelError": 0.000152587890625,
+      "maxSelectedConfidenceError": 2.771615982055664e-06,
+      "maxAllOutputAbsError": 0.00213623046875,
+      "opset": 17,
+      "precision": "FP32",
+      "dynamic": false,
+      "nms": false
+    }
+  }
+}

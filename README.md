@@ -33,28 +33,23 @@ All historical models are included through Git LFS, totaling approximately 1 GB 
 ```sh
 GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/jramsdell-nym/video-to-2d-skele.git
 cd video-to-2d-skele
-git lfs pull --include='models/releases/2026-11-19/*.pt,models/releases/2026-11-19/*.onnx'
+git lfs pull --include='models/releases/2026-11-19/body.pt,models/releases/2026-11-19/body.onnx,models/releases/2026-11-19/bat.pt,models/releases/2026-11-19/bat.onnx'
 python3 verify_models.py --defaults-only
 ```
 
 ## Current models
 
-The runner defaults to the **November 19, 2026** body and bat retrain in [`models/releases/2026-11-19/`](models/releases/2026-11-19/README.md). Both PyTorch checkpoints and ONNX exports are included through Git LFS.
+The latest published candidates are the [November 19 round 2 body and bat detectors](models/releases/2026-11-19-r2/README.md). The tested standalone defaults are body `2026-11-19`, bat `2026-11-19`. To run both candidates, select the release ID explicitly:
 
-| Model | Files | Input | Output |
-| --- | --- | --- | --- |
-| Batting body | `body.pt`, `body.onnx` | 640 × 640 RGB letterbox | COCO 17-slot head; the 12 limb joints are used |
-| Bat tip and knob | `bat.pt`, `bat.onnx` | 768 × 768 RGB letterbox | Physical barrel tip first, handle knob second |
+```sh
+git lfs pull --include='models/releases/2026-11-19-r2/*.pt,models/releases/2026-11-19-r2/*.onnx'
+python predict.py /path/to/batting.mp4 --model-release 2026-11-19-r2 \
+  --output outputs/round2.jsonl --overlay outputs/round2.mp4
+```
 
-The body training labels supervise shoulders, elbows, wrists, hips, knees, and ankles. The head's five face slots are not supervised by these batting labels and are deliberately omitted from the runner's output. Bat tip and knob retain their physical identities for both batting sides.
+Use `--model-release 2026-11-19` to compare with the [November 19 first run](models/releases/2026-11-19/README.md). Both body checkpoints use a 640 px input and provide the 12 anatomical shoulder-through-ankle landmarks. Both bat checkpoints use a 768 px input and return the physical barrel tip and terminal knob.
 
-`models/manifest.json` records every included model/package file, exact byte size, SHA-256 checksum, current keypoint ordering, and current ONNX input/output dimensions. The November 19 inference checkpoints have sanitized metadata and exactly matching trained weight tensors; their original training checkpoint hashes and export checks are recorded in the [release validation](models/releases/2026-11-19/validation.json). Historical checkpoints remain byte-for-byte, including their original training metadata and local path strings. Only load PyTorch checkpoints from trusted sources.
-
-The earlier self-contained bat-only example is under `exports/yolo-bat-model-2026-11-12/`; its README covers image inference using ONNX and the bundled FP32 Core ML package. Those exports belong to the earlier checkpoint, not the November 19 models. FP16 and FP32 Core ML export experiments are also preserved in `experiments/bat-ios-export/`.
-
-The November 19 retrain improved paired bat-endpoint agreement from 75.04% to 78.49% and overall body-joint agreement from 88.61% to 88.78% on the reused development evaluation. Wrist agreement decreased from 88.46% to 87.55%. These are comparisons with partly interpolated/model-assisted references, not independent production accuracy. See the [release notes](models/releases/2026-11-19/README.md) for counts, tolerances, provenance, and November 18 rollback instructions.
-
-This default applies to the standalone 2D runner. The [native iPhone app](https://github.com/jramsdell-nym/Fan-Lab-Iphone-App) retains its separately integrated Apple Vision body detector and November 9 bat detector.
+The [round 2 report](models/releases/2026-11-19-r2/README.md) compares all body joints, wrists and both bat endpoints on the original five evaluation swings and on newly submitted swings. The [model manifest](models/manifest.json) records every file's size and SHA-256 plus the selected model for each task. See the [training guide](training/README.md) for the commands used to prepare private reviewed data, train the two detectors, evaluate them and package their exports. The native [iPhone app](https://github.com/jramsdell-nym/Fan-Lab-Iphone-App) owns its detector selection separately.
 
 ## Output contract
 
@@ -72,6 +67,7 @@ Defaults: detection confidence 0.25, body keypoint confidence 0.30, bat endpoint
 
 | Path | Purpose |
 | --- | --- |
+| `training/`, `tools/` | Continuation training, evaluation and verified export |
 | `batting/`, `predict.py` | Standalone local video inference and timestamped export |
 | `experiments/2d-tracking/src/` | Original YOLO, Apple Vision, MediaPipe comparison, association, rendering, and validation code |
 | `experiments/2d-tracking/labeler/` | Local labeling UI, suggestions, and bat training |

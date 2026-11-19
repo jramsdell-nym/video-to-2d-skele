@@ -1,0 +1,77 @@
+{
+  "baselineRelease": "2026-11-19",
+  "training": {
+    "body": {
+      "epochs": 10,
+      "imageSize": 640,
+      "learningRate": 2.5e-05,
+      "seed": 42,
+      "freeze": 10,
+      "trainFrames": 2641,
+      "trainVideos": 19,
+      "valFrames": 241,
+      "valVideos": 2
+    },
+    "bat": {
+      "epochs": 10,
+      "imageSize": 768,
+      "learningRate": 2.5e-05,
+      "seed": 42,
+      "freeze": 10,
+      "trainFrames": 2608,
+      "trainVideos": 19,
+      "valFrames": 241,
+      "valVideos": 2
+    }
+  },
+  "evaluation": {
+    "frames": 601,
+    "videos": 5,
+    "sessions": 3,
+    "bodyJoints": {
+      "baseline": {
+        "correct": 6155,
+        "total": 6933
+      },
+      "candidate": {
+        "correct": 6191,
+        "total": 6933
+      }
+    },
+    "wrists": {
+      "baseline": {
+        "correct": 956,
+        "total": 1092
+      },
+      "candidate": {
+        "correct": 946,
+        "total": 1092
+      }
+    },
+    "batPairs": {
+      "baseline": {
+        "correct": 456,
+        "total": 581
+      },
+      "candidate": {
+        "correct": 443,
+        "total": 581
+      }
+    }
+  },
+  "dataset": {
+    "addedCompletedAssignments": 9,
+    "completedAssignments": 32,
+    "submittedFrames": 4107,
+    "body": {
+      "previousEligibleFrames": 3003,
+      "eligibleFrames": 4083,
+      "eligibleSwings": 31
+    },
+    "bat": {
+      "previousEligibleFrames": 2970,
+      "eligibleFrames": 4050,
+      "eligibleSwings": 31
+    }
+  }
+}
