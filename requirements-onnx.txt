@@ -1,3 +1,4 @@
+onnx==1.18.0
 onnxruntime==1.22.0
 numpy==2.5.4
 opencv-python==5.0.0.93

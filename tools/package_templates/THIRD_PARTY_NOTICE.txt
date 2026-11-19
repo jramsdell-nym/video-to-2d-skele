@@ -1,0 +1,15 @@
+The body and BAT candidates derive from Ultralytics YOLO pose models.
+Their upstream software and checkpoint metadata identify AGPL-3.0.
+The unmodified upstream license text is included as LICENSE.
+Upstream project: https://github.com/ultralytics/ultralytics
+Upstream license: https://github.com/ultralytics/ultralytics/blob/main/LICENSE
+
+The local runner source is supplied from Fan Lab's video-to-2D repository:
+https://github.com/jramsdell-nym/video-to-2d-skele
+No new permissive license is assigned to original Fan Lab code by this
+handoff. This notice does not grant additional model, software or data rights.
+
+Python dependencies are installed separately, not bundled in this ZIP.
+Each retains its own license. Exact direct package versions are in the
+requirements files; export/runtime versions are also recorded in validation.
+No training footage, player labels or credentials are included.

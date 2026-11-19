@@ -91,9 +91,18 @@ def validate_paths(video, output, overlay, model_paths):
             raise ValueError(f'Refusing to overwrite: {path}; choose a new output path')
 
 
+def model_specs(manifest, release):
+    if release is None:
+        return manifest['defaults']
+    releases = manifest.get('releases', {manifest['release']: manifest['defaults']})
+    if release not in releases:
+        raise ValueError('Unknown model release. Available releases: ' + ', '.join(sorted(releases)))
+    return releases[release]
+
+
 def run(args):
     manifest = json.loads((ROOT / 'models/manifest.json').read_text())
-    specs = manifest['defaults']
+    specs = model_specs(manifest, args.model_release)
     paths = {kind: ROOT / spec['checkpoint'] for kind, spec in specs.items()}
     validate_paths(args.video, args.output, args.overlay, paths.values())
     for kind, path in paths.items():
@@ -226,6 +235,7 @@ def main(argv=None):
     parser.add_argument('--overlay', type=Path, help='Optional new silent MP4 with 2D overlays')
     parser.add_argument('--device', default='cpu', help='cpu (default), mps on Apple silicon, or 0 for CUDA')
     parser.add_argument('--confidence', type=float, default=.25)
+    parser.add_argument('--model-release', help='Use an archived body and bat pair by release ID')
     parser.add_argument('--body-confidence', type=float, default=.30)
     parser.add_argument('--bat-confidence', type=float, default=.25)
     parser.add_argument('--threads', type=int, default=4)

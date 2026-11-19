@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 from batting.tracking import HitterSelector
-from batting.video import point, validate_paths
+from batting.video import model_specs, point, validate_paths
 
 
 def pose(left, top, size):
@@ -13,6 +13,17 @@ def pose(left, top, size):
 
 
 class VideoContractTests(unittest.TestCase):
+    def test_release_selection_preserves_mixed_defaults(self):
+        previous = {'body':'older-body','bat':'older-bat'}
+        retrained = {'body':'newer-body','bat':'newer-bat'}
+        manifest = {'release':'r2', 'defaults':{'body':'older-body','bat':'newer-bat'},
+                    'releases': {'r1':previous, 'r2':retrained}}
+        self.assertEqual(model_specs(manifest, None), manifest['defaults'])
+        self.assertEqual(model_specs(manifest, 'r2'), retrained)
+        self.assertEqual(model_specs(manifest, 'r1'), previous)
+        with self.assertRaisesRegex(ValueError, 'Available releases'):
+            model_specs(manifest, '../untracked-model')
+
     def test_nonfinite_is_missing_and_json_safe(self):
         p = point(float('nan'), 10, .9, 100, 100, .3)
         self.assertFalse(p['usable'])
