@@ -1,0 +1,142 @@
+{
+  "packageDate": "2026-11-12",
+  "checkpointId": "bat-20261109T164108Z",
+  "architecture": "YOLO11s-pose",
+  "task": "2D bat tip and physical knob localization",
+  "classNames": {
+    "0": "bat"
+  },
+  "endpointOrder": [
+    "tip",
+    "knob"
+  ],
+  "keypointShape": [
+    2,
+    3
+  ],
+  "sourceCheckpointSHA256": "551e793cc59c9b8129b5be0dca139ec8f506127838cade2fde35ce441ecc35e6",
+  "onnxSHA256": "e03e76cbf07d2fb139777c99f8af9ec66e5ae4c27558288a716d1912225bcbad",
+  "training": {
+    "labeledFrames": 129,
+    "videos": 6,
+    "completeManualDraftsIncluded": 20,
+    "finalFitIncludesEarlierValidationVideo": true
+  },
+  "input": {
+    "imageSize": [
+      768,
+      768
+    ],
+    "channels": "RGB",
+    "onnx": {
+      "name": "images",
+      "shape": [
+        1,
+        3,
+        768,
+        768
+      ],
+      "dtype": "float32",
+      "valueRange": [
+        0,
+        1
+      ]
+    },
+    "preprocessing": "EXIF upright, bilinear proportional resize, centered gray114 padding, no rectangular/minimal padding",
+    "coreml": {
+      "name": "image",
+      "type": "RGB image, uint8 0..255",
+      "width": 768,
+      "height": 768,
+      "inModelScale": 0.00392156862745098,
+      "bias": [
+        0,
+        0,
+        0
+      ],
+      "resize": "centered aspect-fit letterbox, gray114"
+    }
+  },
+  "output": {
+    "onnxName": "output0",
+    "coremlName": "var_1347",
+    "shape": [
+      1,
+      11,
+      12096
+    ],
+    "channels": [
+      "centerX",
+      "centerY",
+      "width",
+      "height",
+      "batScore",
+      "tipX",
+      "tipY",
+      "tipScore",
+      "knobX",
+      "knobY",
+      "knobScore"
+    ],
+    "scores": "Already sigmoid; no separate objectness",
+    "coordinates": "Padded-image pixels; remove padding and divide by gain",
+    "nmsIncluded": false
+  },
+  "examplePolicy": {
+    "batScoreMinimum": 0.25,
+    "endpointScoreMinimum": 0.25,
+    "selection": "highest bat class score",
+    "requireBothEndpointsInImage": true,
+    "hitterAssociation": false,
+    "temporalSmoothing": false
+  },
+  "developmentEvaluation": {
+    "completePairs": 207,
+    "sourceVideos": 2,
+    "pairedPCK10PercentBatLength": {
+      "successes": 150,
+      "total": 207
+    },
+    "pairedPCK25Pixels": {
+      "successes": 166,
+      "total": 207
+    },
+    "labels": "Provisional, includes interpolation and model assistance",
+    "missingPredictionsCountAsFailures": true,
+    "finalTest": false
+  },
+  "coremlHistoricalParity": {
+    "comparison": "FP32 Core ML CPU versus PyTorch, identical input",
+    "frames": 36,
+    "maximumEndpointDiscrepancyPixels": 0.00017059844799040144,
+    "topCandidateMismatches": 0,
+    "accuracyEvaluation": false
+  },
+  "packagedModelFiles": [
+    {
+      "path": "models/BatTipKnobFP32.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 162614,
+      "sha256": "6e8e907680ecaed4cf3691495eb9b61e678549a233870bfd57c51bd701658927"
+    },
+    {
+      "path": "models/BatTipKnobFP32.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 39052736,
+      "sha256": "a345481a9a49ce71de56fbff00a70060679cba59fea3629fb2429f10652fe358"
+    },
+    {
+      "path": "models/BatTipKnobFP32.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "f94734502c6cb7991d2ff1283afe45f8f8e19558a7178a55184c0bb02f074758"
+    },
+    {
+      "path": "models/bat-tip-knob.onnx",
+      "bytes": 39261940,
+      "sha256": "e03e76cbf07d2fb139777c99f8af9ec66e5ae4c27558288a716d1912225bcbad"
+    },
+    {
+      "path": "models/bat-tip-knob.pt",
+      "bytes": 19754888,
+      "sha256": "551e793cc59c9b8129b5be0dca139ec8f506127838cade2fde35ce441ecc35e6"
+    }
+  ]
+}

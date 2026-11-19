@@ -1,0 +1,95 @@
+{
+  "date": "2026-11-12",
+  "onnxStructuralValidation": "passed",
+  "packagedCheckpointClassAndEndpointShape": "passed",
+  "onnxVsPytorch": {
+    "samples": 6,
+    "preprocessingIdentical": true,
+    "topCandidateMismatches": 0,
+    "acceptanceMismatches": 0,
+    "maximumEndpointDifferencePixels": 7.62939453125e-05,
+    "checks": [
+      {
+        "sample": 1,
+        "inputPixelsIdentical": true,
+        "accepted": true,
+        "sameSelectedCandidate": true,
+        "endpointDifferencePixels": [
+          7.62939453125e-05,
+          0.0
+        ],
+        "maxRawAbsoluteDifference": 0.001007080078125
+      },
+      {
+        "sample": 2,
+        "inputPixelsIdentical": true,
+        "accepted": true,
+        "sameSelectedCandidate": true,
+        "endpointDifferencePixels": [
+          7.62939453125e-05,
+          0.0
+        ],
+        "maxRawAbsoluteDifference": 0.000732421875
+      },
+      {
+        "sample": 3,
+        "inputPixelsIdentical": true,
+        "accepted": true,
+        "sameSelectedCandidate": true,
+        "endpointDifferencePixels": [
+          3.814697265625e-05,
+          7.62939453125e-05
+        ],
+        "maxRawAbsoluteDifference": 0.000885009765625
+      },
+      {
+        "sample": 4,
+        "inputPixelsIdentical": true,
+        "accepted": false,
+        "sameSelectedCandidate": true,
+        "endpointDifferencePixels": [
+          0.0,
+          0.0
+        ],
+        "maxRawAbsoluteDifference": 0.000732421875
+      },
+      {
+        "sample": 5,
+        "inputPixelsIdentical": true,
+        "accepted": false,
+        "sameSelectedCandidate": true,
+        "endpointDifferencePixels": [
+          7.62939453125e-05,
+          7.62939453125e-05
+        ],
+        "maxRawAbsoluteDifference": 0.001068115234375
+      },
+      {
+        "sample": 6,
+        "inputPixelsIdentical": true,
+        "accepted": true,
+        "sameSelectedCandidate": true,
+        "endpointDifferencePixels": [
+          3.814697265625e-05,
+          0.0
+        ],
+        "maxRawAbsoluteDifference": 0.00079345703125
+      }
+    ]
+  },
+  "decoderChecks": [
+    "non-square coordinate inversion",
+    "tip-knob identity",
+    "low endpoint confidence rejected",
+    "out-of-image endpoint rejected",
+    "low bat score rejected"
+  ],
+  "recipientCommandSmokeTest": "passed, JSON and annotated image produced from a different working directory",
+  "onnxEnvironment": {
+    "python": "3.12.14",
+    "onnxruntime": "1.22.0",
+    "numpy": "2.5.4"
+  },
+  "coremlValidation": "Model package copied byte-for-byte and hashes matched historical 36-frame FP32 parity receipt. Core ML inference was not rerun for this packaging operation.",
+  "accuracyEvaluationPerformed": false
+}

@@ -1,0 +1,329 @@
+{
+  "schemaVersion": 1,
+  "release": "2026-11-18",
+  "scope": "batting 2D body and bat pose",
+  "defaults": {
+    "body": {
+      "checkpoint": "experiments/vision-improvement/releases/2026-11-18-labeler/body-2026-11-18.pt",
+      "sha256": "edf3f8c06a8cf43d6c1727909222f46019306229969c2a0ebef0107b979ae9ee",
+      "onnx": "experiments/vision-improvement/releases/2026-11-18-labeler/body-2026-11-18.onnx",
+      "onnxSHA256": "7690c7d30ce18ed479b03f54d354eb653fd09fac32f3abd915c72acdd3fe4d58",
+      "inputShape": [
+        1,
+        3,
+        640,
+        640
+      ],
+      "outputShape": [
+        1,
+        56,
+        8400
+      ],
+      "keypointOrder": [
+        "nose",
+        "left_eye",
+        "right_eye",
+        "left_ear",
+        "right_ear",
+        "left_shoulder",
+        "right_shoulder",
+        "left_elbow",
+        "right_elbow",
+        "left_wrist",
+        "right_wrist",
+        "left_hip",
+        "right_hip",
+        "left_knee",
+        "right_knee",
+        "left_ankle",
+        "right_ankle"
+      ],
+      "nativeONNXParity": {
+        "cases": 15,
+        "maxSelectedSourcePixelError": 0.000274658203125
+      }
+    },
+    "bat": {
+      "checkpoint": "experiments/vision-improvement/releases/2026-11-18-labeler/bat-2026-11-18.pt",
+      "sha256": "4f815fad7b24d325770ed0f2234fd61c138b1b90abd2ad97ce4c94a45206bfab",
+      "onnx": "experiments/vision-improvement/releases/2026-11-18-labeler/bat-2026-11-18.onnx",
+      "onnxSHA256": "cd214a51ae7d32c6b4eba3799c5330bc86d9bebdc226da5d1ae2349e8b59b487",
+      "inputShape": [
+        1,
+        3,
+        768,
+        768
+      ],
+      "outputShape": [
+        1,
+        11,
+        12096
+      ],
+      "keypointOrder": [
+        "tip",
+        "knob"
+      ],
+      "nativeONNXParity": {
+        "cases": 15,
+        "maxSelectedSourcePixelError": 7.62939453125e-05
+      }
+    }
+  },
+  "files": [
+    {
+      "path": "experiments/2d-tracking/labeler/models/bat-20261109T151255Z/model.pt",
+      "sha256": "e055aac6c894edab2d41c15cd367d74cfd2e57741e622e77da1cb601a013cd3f",
+      "bytes": 19754888
+    },
+    {
+      "path": "experiments/2d-tracking/labeler/models/bat-20261109T164108Z/model.pt",
+      "sha256": "551e793cc59c9b8129b5be0dca139ec8f506127838cade2fde35ce441ecc35e6",
+      "bytes": 19754888
+    },
+    {
+      "path": "experiments/2d-tracking/labeler/training/bat-20261109T151255Z/holdout/weights/best.pt",
+      "sha256": "67e695919c4c70382f0408ce9d77ba62075ab0cfaa61327f13b5f305bd426b92",
+      "bytes": 19766856
+    },
+    {
+      "path": "experiments/2d-tracking/labeler/training/bat-20261109T151255Z/holdout/weights/last.pt",
+      "sha256": "0984fddbd8de7f76addf30d739e758e2654f99d63bd652f325f757c8a48185fe",
+      "bytes": 19766856
+    },
+    {
+      "path": "experiments/2d-tracking/labeler/training/bat-20261109T151255Z/refit/weights/best.pt",
+      "sha256": "335c839b5aea11e19ff0833e45637cb8342950aedc74460ddb3008e598db98ff",
+      "bytes": 19754888
+    },
+    {
+      "path": "experiments/2d-tracking/labeler/training/bat-20261109T151255Z/refit/weights/last.pt",
+      "sha256": "e055aac6c894edab2d41c15cd367d74cfd2e57741e622e77da1cb601a013cd3f",
+      "bytes": 19754888
+    },
+    {
+      "path": "experiments/2d-tracking/labeler/training/bat-20261109T164108Z/holdout/weights/best.pt",
+      "sha256": "25809a612c21518b1fd820d2df249809578ac24ac7a84a386168a4811d331bc9",
+      "bytes": 19766664
+    },
+    {
+      "path": "experiments/2d-tracking/labeler/training/bat-20261109T164108Z/holdout/weights/last.pt",
+      "sha256": "1bc29ae5fad9507b4d58f228e5b587f9141ea4700fc28b59068269baeac52163",
+      "bytes": 19766664
+    },
+    {
+      "path": "experiments/2d-tracking/labeler/training/bat-20261109T164108Z/refit/weights/best.pt",
+      "sha256": "a696294db227ae3c9cd6c6b973886d2726ba4a0170a65dd89f33751424b046d5",
+      "bytes": 19754888
+    },
+    {
+      "path": "experiments/2d-tracking/labeler/training/bat-20261109T164108Z/refit/weights/last.pt",
+      "sha256": "551e793cc59c9b8129b5be0dca139ec8f506127838cade2fde35ce441ecc35e6",
+      "bytes": 19754888
+    },
+    {
+      "path": "experiments/2d-tracking/models/yolo11m.pt",
+      "sha256": "d5ffc1a674953a08e11a8d21e022781b1b23a19b730afc309290bd9fb5305b95",
+      "bytes": 40684120
+    },
+    {
+      "path": "experiments/2d-tracking/models/yolo11s-pose.pt",
+      "sha256": "1060bda4a27012060eca246f9b2adeea22eabb045a1e58f8d229be29b7ebc2ba",
+      "bytes": 20373161
+    },
+    {
+      "path": "experiments/bat-ios-export/bat-tip-knob-768-fp32.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "sha256": "6e8e907680ecaed4cf3691495eb9b61e678549a233870bfd57c51bd701658927",
+      "bytes": 162614
+    },
+    {
+      "path": "experiments/bat-ios-export/bat-tip-knob-768-fp32.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "sha256": "a345481a9a49ce71de56fbff00a70060679cba59fea3629fb2429f10652fe358",
+      "bytes": 39052736
+    },
+    {
+      "path": "experiments/bat-ios-export/bat-tip-knob-768-fp32.mlpackage/Manifest.json",
+      "sha256": "f94734502c6cb7991d2ff1283afe45f8f8e19558a7178a55184c0bb02f074758",
+      "bytes": 617
+    },
+    {
+      "path": "experiments/bat-ios-export/bat-tip-knob-768-fp32.pt",
+      "sha256": "551e793cc59c9b8129b5be0dca139ec8f506127838cade2fde35ce441ecc35e6",
+      "bytes": 19754888
+    },
+    {
+      "path": "experiments/bat-ios-export/bat-tip-knob-768.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "sha256": "a79edb27fe543cb0889a3c29c5c96be2fed50764ec477ec3330690fd3233efae",
+      "bytes": 176744
+    },
+    {
+      "path": "experiments/bat-ios-export/bat-tip-knob-768.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "sha256": "b08440392cf09f31d66ca1c2af5a3ebe3df9dc68dd331a65a090370a929e6408",
+      "bytes": 19532544
+    },
+    {
+      "path": "experiments/bat-ios-export/bat-tip-knob-768.mlpackage/Manifest.json",
+      "sha256": "fe9a4876d233fd30eca822700b9680a32ca1cc339f18a6e2bac28143a5cd36f9",
+      "bytes": 617
+    },
+    {
+      "path": "experiments/bat-ios-export/bat-tip-knob-768.pt",
+      "sha256": "551e793cc59c9b8129b5be0dca139ec8f506127838cade2fde35ce441ecc35e6",
+      "bytes": 19754888
+    },
+    {
+      "path": "experiments/vision-improvement/cycles/2026-11-18/training/bat/candidate/weights/best.pt",
+      "sha256": "e3c42890e1c9da896e849fd047b0d376aab2c22bdf244f3a27cf868638d05966",
+      "bytes": 19754888
+    },
+    {
+      "path": "experiments/vision-improvement/cycles/2026-11-18/training/bat/candidate/weights/last.pt",
+      "sha256": "4f815fad7b24d325770ed0f2234fd61c138b1b90abd2ad97ce4c94a45206bfab",
+      "bytes": 19754888
+    },
+    {
+      "path": "experiments/vision-improvement/cycles/2026-11-18/training/body/candidate/weights/best.pt",
+      "sha256": "69899aa8c1976be44d6762e336bcadcd732d56272b8d4b6ef4c07cf35b9de819",
+      "bytes": 6034120
+    },
+    {
+      "path": "experiments/vision-improvement/cycles/2026-11-18/training/body/candidate/weights/last.pt",
+      "sha256": "edf3f8c06a8cf43d6c1727909222f46019306229969c2a0ebef0107b979ae9ee",
+      "bytes": 6034120
+    },
+    {
+      "path": "experiments/vision-improvement/releases/2026-11-18-labeler/bat-2026-11-18.onnx",
+      "sha256": "cd214a51ae7d32c6b4eba3799c5330bc86d9bebdc226da5d1ae2349e8b59b487",
+      "bytes": 39262375
+    },
+    {
+      "path": "experiments/vision-improvement/releases/2026-11-18-labeler/bat-2026-11-18.pt",
+      "sha256": "4f815fad7b24d325770ed0f2234fd61c138b1b90abd2ad97ce4c94a45206bfab",
+      "bytes": 19754888
+    },
+    {
+      "path": "experiments/vision-improvement/releases/2026-11-18-labeler/body-2026-11-18.onnx",
+      "sha256": "7690c7d30ce18ed479b03f54d354eb653fd09fac32f3abd915c72acdd3fe4d58",
+      "bytes": 11811269
+    },
+    {
+      "path": "experiments/vision-improvement/releases/2026-11-18-labeler/body-2026-11-18.pt",
+      "sha256": "edf3f8c06a8cf43d6c1727909222f46019306229969c2a0ebef0107b979ae9ee",
+      "bytes": 6034120
+    },
+    {
+      "path": "experiments/vision-improvement/research/body-experiment/session-holdout-20261111/candidate/weights/best.pt",
+      "sha256": "c4e3070b95d0fa382a25f7522d3467a02dbc55a941c69e25a3637c8b4bcf6186",
+      "bytes": 5838984
+    },
+    {
+      "path": "experiments/vision-improvement/research/body-experiment/session-holdout-20261111/candidate/weights/last.pt",
+      "sha256": "538ed09c066b37a72f989a400dae262014b5638db05b3f6d058b8a193050fa52",
+      "bytes": 5838984
+    },
+    {
+      "path": "experiments/vision-improvement/research/body-experiment/session-holdout-20261111/generic-yolo11n-pose.pt",
+      "sha256": "869e83fcdffdc7371fa4e34cd8e51c838cc729571d1635e5141e3075e9319dc0",
+      "bytes": 6255593
+    },
+    {
+      "path": "experiments/vision-improvement/training/body-conservative-20261111/candidate/weights/best.pt",
+      "sha256": "222f0e89f841d569844c4d6571acff0a12efd444cc91e501e85301f15d3f3b95",
+      "bytes": 6034120
+    },
+    {
+      "path": "experiments/vision-improvement/training/body-conservative-20261111/candidate/weights/last.pt",
+      "sha256": "65d639dbbc84f985f3f178e17a3a4a2733d818e2c8b9c1aa582d1430463ccfa4",
+      "bytes": 6034120
+    },
+    {
+      "path": "experiments/vision-improvement/training/body-conservative-20261111/generic-yolo11n-pose.pt",
+      "sha256": "869e83fcdffdc7371fa4e34cd8e51c838cc729571d1635e5141e3075e9319dc0",
+      "bytes": 6255593
+    },
+    {
+      "path": "experiments/vision-improvement/training/player-holdout-clean-20261111/baseline/weights/best.pt",
+      "sha256": "0c343b72742dcec76473314266b11d39c1ac0da8832581642a580e5821d79bff",
+      "bytes": 19758856
+    },
+    {
+      "path": "experiments/vision-improvement/training/player-holdout-clean-20261111/baseline/weights/epoch0.pt",
+      "sha256": "eb99a8d8dae73286b886303837f08ff457e1b11dcad66f75cc2e2fd83b2e6e70",
+      "bytes": 62039386
+    },
+    {
+      "path": "experiments/vision-improvement/training/player-holdout-clean-20261111/baseline/weights/epoch10.pt",
+      "sha256": "5bca5af18b4232e352605ba521d3e99282d8aa513e4b49d45d2a2d359ebc0e96",
+      "bytes": 62041434
+    },
+    {
+      "path": "experiments/vision-improvement/training/player-holdout-clean-20261111/baseline/weights/epoch20.pt",
+      "sha256": "3d345a999dc80feeb191dadcb21e6efc6bf1365eb97dc36b9212c261c4db3448",
+      "bytes": 62043418
+    },
+    {
+      "path": "experiments/vision-improvement/training/player-holdout-clean-20261111/baseline/weights/epoch30.pt",
+      "sha256": "d2adf1bec6c7193d2498b4968f0270db923008eb83d60a356a644006dc5d23f0",
+      "bytes": 62045402
+    },
+    {
+      "path": "experiments/vision-improvement/training/player-holdout-clean-20261111/baseline/weights/last.pt",
+      "sha256": "5771bb4a27b95f0ec1ce4febf009c60c266ebf45b7e9708c81a24851af89451d",
+      "bytes": 19758856
+    },
+    {
+      "path": "experiments/vision-improvement/training/player-holdout-clean-20261111/candidate/weights/best.pt",
+      "sha256": "184f058a84d993808e1d73c8404648ce46991f52e7bc2a4e3cb2df214252aeb1",
+      "bytes": 19758856
+    },
+    {
+      "path": "experiments/vision-improvement/training/player-holdout-clean-20261111/candidate/weights/epoch0.pt",
+      "sha256": "5a38d79ae4df95cce22b15574f881216a459049bf1d070750287ce64a5e43b67",
+      "bytes": 62039386
+    },
+    {
+      "path": "experiments/vision-improvement/training/player-holdout-clean-20261111/candidate/weights/epoch10.pt",
+      "sha256": "46bd48933ecd79f51d5e34732a52bcb9d76f79e861ece527782a5dba2fe129ce",
+      "bytes": 62041370
+    },
+    {
+      "path": "experiments/vision-improvement/training/player-holdout-clean-20261111/candidate/weights/epoch20.pt",
+      "sha256": "429aeae86ce1b2e169af84efce1d6cf640af86b7711ae18ab3801acc4a8f4525",
+      "bytes": 62043418
+    },
+    {
+      "path": "experiments/vision-improvement/training/player-holdout-clean-20261111/candidate/weights/epoch30.pt",
+      "sha256": "c6c6b76eda25cd01cafa61dcd1312515ad30b90ca8cb78b6aebe5e33eaea0523",
+      "bytes": 62045402
+    },
+    {
+      "path": "experiments/vision-improvement/training/player-holdout-clean-20261111/candidate/weights/last.pt",
+      "sha256": "62b69eed26f4248612c20283482ddd7330f82e2d703bf519feaac37b61b9d8e9",
+      "bytes": 19758856
+    },
+    {
+      "path": "exports/yolo-bat-model-2026-11-12/models/BatTipKnobFP32.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "sha256": "6e8e907680ecaed4cf3691495eb9b61e678549a233870bfd57c51bd701658927",
+      "bytes": 162614
+    },
+    {
+      "path": "exports/yolo-bat-model-2026-11-12/models/BatTipKnobFP32.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "sha256": "a345481a9a49ce71de56fbff00a70060679cba59fea3629fb2429f10652fe358",
+      "bytes": 39052736
+    },
+    {
+      "path": "exports/yolo-bat-model-2026-11-12/models/BatTipKnobFP32.mlpackage/Manifest.json",
+      "sha256": "f94734502c6cb7991d2ff1283afe45f8f8e19558a7178a55184c0bb02f074758",
+      "bytes": 617
+    },
+    {
+      "path": "exports/yolo-bat-model-2026-11-12/models/bat-tip-knob.onnx",
+      "sha256": "e03e76cbf07d2fb139777c99f8af9ec66e5ae4c27558288a716d1912225bcbad",
+      "bytes": 39261940
+    },
+    {
+      "path": "exports/yolo-bat-model-2026-11-12/models/bat-tip-knob.pt",
+      "sha256": "551e793cc59c9b8129b5be0dca139ec8f506127838cade2fde35ce441ecc35e6",
+      "bytes": 19754888
+    }
+  ]
+}
