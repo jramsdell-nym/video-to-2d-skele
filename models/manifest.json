@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "release": "2026-11-18",
+  "release": "2026-11-19",
   "scope": "batting 2D body and bat pose",
   "defaults": {
     "body": {
-      "checkpoint": "experiments/vision-improvement/releases/2026-11-18-labeler/body-2026-11-18.pt",
-      "sha256": "edf3f8c06a8cf43d6c1727909222f46019306229969c2a0ebef0107b979ae9ee",
-      "onnx": "experiments/vision-improvement/releases/2026-11-18-labeler/body-2026-11-18.onnx",
-      "onnxSHA256": "7690c7d30ce18ed479b03f54d354eb653fd09fac32f3abd915c72acdd3fe4d58",
+      "checkpoint": "models/releases/2026-11-19/body.pt",
+      "sha256": "61cc753dac13e4d2736bde3ecd5a737afb24db84ba7aede25bf988df76bd4272",
+      "onnx": "models/releases/2026-11-19/body.onnx",
+      "onnxSHA256": "f969bb298ee06afa026531684bf3f539d98b381850fa2fc492814a0c0fda8e6e",
       "inputShape": [
         1,
         3,
@@ -19,6 +19,8 @@
         56,
         8400
       ],
+      "inputName": "images",
+      "outputName": "output0",
       "keypointOrder": [
         "nose",
         "left_eye",
@@ -40,14 +42,14 @@
       ],
       "nativeONNXParity": {
         "cases": 15,
-        "maxSelectedSourcePixelError": 0.000274658203125
+        "maxSelectedSourcePixelError": 0.0003662109375
       }
     },
     "bat": {
-      "checkpoint": "experiments/vision-improvement/releases/2026-11-18-labeler/bat-2026-11-18.pt",
-      "sha256": "4f815fad7b24d325770ed0f2234fd61c138b1b90abd2ad97ce4c94a45206bfab",
-      "onnx": "experiments/vision-improvement/releases/2026-11-18-labeler/bat-2026-11-18.onnx",
-      "onnxSHA256": "cd214a51ae7d32c6b4eba3799c5330bc86d9bebdc226da5d1ae2349e8b59b487",
+      "checkpoint": "models/releases/2026-11-19/bat.pt",
+      "sha256": "d8b34f995f70920c543fa3c7bd2b4f680a3b123a58ed3a3c3b687b546912175d",
+      "onnx": "models/releases/2026-11-19/bat.onnx",
+      "onnxSHA256": "8f7438a85d880ab828baa08910dcf2bcd34ebe87e8980af149063a8a81511e11",
       "inputShape": [
         1,
         3,
@@ -59,6 +61,8 @@
         11,
         12096
       ],
+      "inputName": "images",
+      "outputName": "output0",
       "keypointOrder": [
         "tip",
         "knob"
@@ -324,6 +328,26 @@
       "path": "exports/yolo-bat-model-2026-11-12/models/bat-tip-knob.pt",
       "sha256": "551e793cc59c9b8129b5be0dca139ec8f506127838cade2fde35ce441ecc35e6",
       "bytes": 19754888
+    },
+    {
+      "path": "models/releases/2026-11-19/body.pt",
+      "sha256": "61cc753dac13e4d2736bde3ecd5a737afb24db84ba7aede25bf988df76bd4272",
+      "bytes": 5990807
+    },
+    {
+      "path": "models/releases/2026-11-19/body.onnx",
+      "sha256": "f969bb298ee06afa026531684bf3f539d98b381850fa2fc492814a0c0fda8e6e",
+      "bytes": 11811625
+    },
+    {
+      "path": "models/releases/2026-11-19/bat.pt",
+      "sha256": "d8b34f995f70920c543fa3c7bd2b4f680a3b123a58ed3a3c3b687b546912175d",
+      "bytes": 19698227
+    },
+    {
+      "path": "models/releases/2026-11-19/bat.onnx",
+      "sha256": "8f7438a85d880ab828baa08910dcf2bcd34ebe87e8980af149063a8a81511e11",
+      "bytes": 39262599
     }
   ]
 }

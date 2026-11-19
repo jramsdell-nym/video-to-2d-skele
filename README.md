@@ -33,24 +33,28 @@ All historical models are included through Git LFS, totaling approximately 1 GB 
 ```sh
 GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/jramsdell-nym/video-to-2d-skele.git
 cd video-to-2d-skele
-git lfs pull --include='experiments/vision-improvement/releases/2026-11-18-labeler/*.pt,experiments/vision-improvement/releases/2026-11-18-labeler/*.onnx'
+git lfs pull --include='models/releases/2026-11-19/*.pt,models/releases/2026-11-19/*.onnx'
 python3 verify_models.py --defaults-only
 ```
 
 ## Current models
 
-The runner uses the **November 18, 2026** checkpoints in `experiments/vision-improvement/releases/2026-11-18-labeler/`.
+The runner defaults to the **November 19, 2026** body and bat retrain in [`models/releases/2026-11-19/`](models/releases/2026-11-19/README.md). Both PyTorch checkpoints and ONNX exports are included through Git LFS.
 
 | Model | Files | Input | Output |
 | --- | --- | --- | --- |
-| Batting body | `body-2026-11-18.pt`, `.onnx` | 640 × 640 RGB letterbox | COCO 17-slot head; the 12 limb joints are used |
-| Bat tip and knob | `bat-2026-11-18.pt`, `.onnx` | 768 × 768 RGB letterbox | Physical barrel tip first, handle knob second |
+| Batting body | `body.pt`, `body.onnx` | 640 × 640 RGB letterbox | COCO 17-slot head; the 12 limb joints are used |
+| Bat tip and knob | `bat.pt`, `bat.onnx` | 768 × 768 RGB letterbox | Physical barrel tip first, handle knob second |
 
 The body training labels supervise shoulders, elbows, wrists, hips, knees, and ankles. The head's five face slots are not supervised by these batting labels and are deliberately omitted from the runner's output. Bat tip and knob retain their physical identities for both batting sides.
 
-`models/manifest.json` records every included model/package file, exact byte size, SHA-256 checksum, current keypoint ordering, and current ONNX input/output dimensions. Checkpoints are retained byte-for-byte, including historical training metadata and original local path strings. Only load PyTorch checkpoints from trusted sources.
+`models/manifest.json` records every included model/package file, exact byte size, SHA-256 checksum, current keypoint ordering, and current ONNX input/output dimensions. The November 19 inference checkpoints have sanitized metadata and exactly matching trained weight tensors; their original training checkpoint hashes and export checks are recorded in the [release validation](models/releases/2026-11-19/validation.json). Historical checkpoints remain byte-for-byte, including their original training metadata and local path strings. Only load PyTorch checkpoints from trusted sources.
 
-The earlier self-contained bat-only example is under `exports/yolo-bat-model-2026-11-12/`; its README covers image inference using ONNX and the bundled FP32 Core ML package. Those exports belong to the earlier checkpoint, not the November 18 model. FP16 and FP32 Core ML export experiments are also preserved in `experiments/bat-ios-export/`.
+The earlier self-contained bat-only example is under `exports/yolo-bat-model-2026-11-12/`; its README covers image inference using ONNX and the bundled FP32 Core ML package. Those exports belong to the earlier checkpoint, not the November 19 models. FP16 and FP32 Core ML export experiments are also preserved in `experiments/bat-ios-export/`.
+
+The November 19 retrain improved paired bat-endpoint agreement from 75.04% to 78.49% and overall body-joint agreement from 88.61% to 88.78% on the reused development evaluation. Wrist agreement decreased from 88.46% to 87.55%. These are comparisons with partly interpolated/model-assisted references, not independent production accuracy. See the [release notes](models/releases/2026-11-19/README.md) for counts, tolerances, provenance, and November 18 rollback instructions.
+
+This default applies to the standalone 2D runner. The [native iPhone app](https://github.com/jramsdell-nym/Fan-Lab-Iphone-App) retains its separately integrated Apple Vision body detector and November 9 bat detector.
 
 ## Output contract
 
