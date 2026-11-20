@@ -82,6 +82,24 @@ The historical experiment scripts retain their original directory structure. The
 
 Private recordings, player annotations, cloud snapshots, databases, reference tensors derived from images, generated reports, credentials, virtual environments, and caches are excluded. The separate 3D lifter and KinaTrax audit projects are outside this 2D repository.
 
+## Open local videos in Swing Review
+
+With PyAV and Pillow installed, start Swing Review from the repository root:
+
+```sh
+python swing-review/server.py --videos "/path/to/swing-recordings"
+```
+
+Open `http://127.0.0.1:8794` and select **Browse local videos**. The picker
+lists MP4, MOV, and M4V files in the folder and its subfolders. If you omit
+`--videos`, the picker uses `local-videos` under the Swing Review data directory.
+
+Select **Load local copy** to save the original clip and start a draft with its
+native frame timestamps. The picker accepts clips up to 128 MiB and 3,600
+frames. It imports footage only. Source annotations stay in their original
+files. Drafts and copied clips are stored in `swing-review/data/` by default.
+Use `--data` to reopen an existing Swing Review workspace.
+
 ## Development
 
 ```sh

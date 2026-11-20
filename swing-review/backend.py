@@ -6,7 +6,9 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
+from tempfile import TemporaryDirectory
 import uuid
 from datetime import datetime, timezone
 
@@ -15,6 +17,9 @@ SNAPSHOT = ROOT.parent / 'experiments/vision-improvement/cycles/2026-11-18/datas
 PREFIX = os.environ.get('SWING_LABELER_PREFIX', 'gs://YOUR_LABELER_BUCKET/app/v1/').rstrip('/') + '/'
 VIDEO_PREFIX = os.environ.get('SWING_VIDEO_PREFIX', 'gs://YOUR_VIDEO_BUCKET/').rstrip('/') + '/'
 GCLOUD = os.environ.get('SWING_GCLOUD', 'gcloud')
+MAX_VIDEO_BYTES = 128 * 1024 * 1024
+MAX_LOCAL_FRAMES = 3600
+LOCAL_VIDEO_EXTENSIONS = {'.mov', '.mp4', '.m4v'}
 
 
 def digest(path):
@@ -31,6 +36,99 @@ def verified_json(path):
     if digest(path) != meta['sha256']:
         raise ValueError('Snapshot checksum mismatch: ' + path.name)
     return json.loads(path.read_text()), meta
+
+
+def decode_frame_index(video, *, local=False):
+    import av
+
+    frames = []
+    dimensions = None
+    with av.open(str(video), format='mov' if local else None) as container:
+        if not container.streams.video:
+            raise ValueError('The source contains no video track')
+        for i, frame in enumerate(container.decode(video=0)):
+            if local and i >= MAX_LOCAL_FRAMES:
+                raise ValueError(f'Local videos must contain at most {MAX_LOCAL_FRAMES:,} frames')
+            if frame.pts is None or frame.time_base is None:
+                raise ValueError('The source contains a frame without a presentation timestamp')
+            size = (frame.width, frame.height)
+            stamp = float(frame.pts * frame.time_base)
+            if local and frames and (size != dimensions or stamp <= frames[-1]['time']):
+                raise ValueError('Local video requires fixed dimensions and increasing frame timestamps')
+            dimensions = size
+            frames.append({'pts': frame.pts, 'timeBase': str(frame.time_base), 'time': stamp, 'index': i})
+    if not frames:
+        raise ValueError('No decodable source frames')
+    width, height = dimensions
+    return width, height, frames
+
+
+def file_version(stat):
+    return stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns
+
+
+class LocalVideoLibrary:
+    def __init__(self, directory, data):
+        self.directory = Path(directory).resolve()
+        self.cache = Path(data) / 'local-sources'
+
+    def entries(self):
+        if not self.directory.is_dir():
+            return
+        for path in sorted(self.directory.rglob('*'), key=lambda path: str(path).casefold()):
+            if path.suffix.lower() not in LOCAL_VIDEO_EXTENSIONS or path.is_symlink() or not path.is_file():
+                continue
+            relative = path.relative_to(self.directory)
+            try:
+                stat = path.stat()
+            except FileNotFoundError:
+                continue
+            version = f'{relative.as_posix()}\0{stat.st_size}\0{stat.st_mtime_ns}'
+            trial_id = 'local-' + hashlib.sha256(version.encode('utf-8', 'surrogateescape')).hexdigest()[:40]
+            yield {'id': trial_id, 'trial': path.stem, 'source': 'Local video',
+                   'session': relative.parent.as_posix() if len(relative.parts) > 1 else 'Local videos',
+                   'cached': False, 'available': True}, path, stat
+
+    def catalog(self):
+        return [row for row, _, _ in self.entries()]
+
+    def load(self, trial_id):
+        from av import FFmpegError
+
+        for row, path, stat in self.entries():
+            if row['id'] == trial_id:
+                break
+        else:
+            raise ValueError('Local video is missing or changed. Reopen the video picker.')
+        if not 0 < stat.st_size <= MAX_VIDEO_BYTES:
+            raise ValueError('Local videos must be between 1 byte and 128 MiB')
+        self.cache.mkdir(parents=True, exist_ok=True, mode=0o700)
+        with TemporaryDirectory(dir=self.cache) as staging:
+            copy = Path(staging) / ('source' + path.suffix.lower())
+            try:
+                with path.open('rb') as source, copy.open('xb') as destination:
+                    if file_version(os.fstat(source.fileno())) != file_version(stat):
+                        raise ValueError('Local video changed while importing. Reopen the video picker.')
+                    shutil.copyfileobj(source, destination)
+                    after = os.fstat(source.fileno())
+            except FileNotFoundError as error:
+                raise ValueError('Local video was moved before import. Reopen the video picker.') from error
+            if file_version(after) != file_version(stat):
+                raise ValueError('Local video changed while importing. Reopen the video picker.')
+            try:
+                width, height, frames = decode_frame_index(copy, local=True)
+            except FFmpegError as error:
+                raise ValueError('Could not decode the local video. Select a playable MP4, MOV or M4V file.') from error
+            sha = digest(copy)
+            video = self.cache / (sha + copy.suffix)
+            copy.chmod(0o600)
+            copy.replace(video)
+        uri = f'local-video:{sha}'
+        return {'id': trial_id, 'clip': {'id': sha[:20], 'sha256': sha, 'width': width,
+                                         'height': height, 'frames': frames},
+                'row': {**row, 'uri': uri, 'generation': None}, 'video': str(video.resolve()),
+                'records': [], 'sourceGeneration': None, 'sourceDigest': sha, 'sourceUri': uri,
+                'owner': 'local-review'}
 
 
 class ReadOnlyBackend:
@@ -60,7 +158,7 @@ class ReadOnlyBackend:
         gen = str(metadata['generation'])
         if generation and gen != str(generation):
             raise ValueError('Source generation changed')
-        if int(metadata.get('size', 0)) > 128 * 1024 * 1024:
+        if int(metadata.get('size', 0)) > MAX_VIDEO_BYTES:
             raise ValueError('Source exceeds the 128 MiB local import limit')
         target = Path(target)
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -96,7 +194,11 @@ class ReadOnlyBackend:
         return self.source('catalog').is_relative_to(self.cloud)
 
     def status(self):
-        _, meta = verified_json(self.source('catalog'))
+        try:
+            _, meta = verified_json(self.source('catalog'))
+        except FileNotFoundError:
+            return {'mode': 'local only', 'catalogGeneration': None, 'retrievedAt': None,
+                    'liveSnapshot': False, 'uploadEnabled': False}
         return {'mode': 'read-only GCS', 'catalogGeneration': meta['generation'],
                 'retrievedAt': meta['retrievedAt'], 'liveSnapshot': self.is_live(),
                 'uploadEnabled': False}
@@ -153,15 +255,7 @@ class ReadOnlyBackend:
         if sha and actual_sha != sha:
             raise ValueError('Video hash does not match the annotation source')
         # Verify every decoded frame, including exact PTS. No FPS-based seeking.
-        import av
-        frames = []
-        with av.open(str(video)) as container:
-            for i, frame in enumerate(container.decode(video=0)):
-                width, height = frame.width, frame.height
-                frames.append({'pts': frame.pts, 'timeBase': str(frame.time_base),
-                               'time': float(frame.pts * frame.time_base), 'index': i})
-        if not frames:
-            raise ValueError('No decodable source frames')
+        width, height, frames = decode_frame_index(video)
         clip = (doc or {}).get('clip') or {'id': actual_sha[:20], 'sha256': actual_sha,
                                          'width': width, 'height': height, 'frames': frames}
         if clip['width'] != width or clip['height'] != height or len(clip['frames']) != len(frames):

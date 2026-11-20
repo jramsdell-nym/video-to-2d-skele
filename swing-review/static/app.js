@@ -60,7 +60,11 @@ function remember(){if(trial)localStorage.setItem('swing-review-view',JSON.strin
 
 async function loadBootstrap(){
   bootstrap=await api('/api/bootstrap');renderQueue();
-  $('connection').textContent='GCS · read only';$('snapshot').textContent=`Catalog snapshot ${new Date(bootstrap.backend.retrievedAt).toLocaleString()}`;
+  const hasSnapshot=Boolean(bootstrap.backend.retrievedAt);
+  $('connection').textContent=hasSnapshot?'GCS · read only':'Local videos';
+  $('snapshot').textContent=hasSnapshot?`Catalog snapshot ${new Date(bootstrap.backend.retrievedAt).toLocaleString()}`:'No GCS catalog snapshot';
+  for(const option of $('catalog-mode').options) option.disabled=option.value!=='local'&&!hasSnapshot;
+  if(!hasSnapshot) $('catalog-mode').value='local';
 }
 function renderQueue(){
   $('queue').replaceChildren();$('trial-count').textContent=`${bootstrap.trials.length} trials`;
@@ -234,18 +238,33 @@ $('canvas').onpointermove=e=>{if(!pointer)return;pointer.pos=pointerPos(e);const
 $('canvas').onpointerup=e=>{if(!pointer)return;const pos=pointerPos(e);pointer=null;run(()=>edit({...pos,visibility:2}));};
 $('canvas').onpointercancel=()=>{pointer=null;drawFrame();};
 
+let catalogRequest=0;
 async function catalog(){
-  $('catalog-summary').textContent='Reading source catalog…';
-  const result=await api(`/api/catalog?q=${encodeURIComponent($('search').value)}&mode=${$('catalog-mode').value}`);
-  $('catalog-summary').textContent=`${result.total} matching trials${result.total>100?' · showing first 100':''}. Import creates a separate local draft.`;
+  const request=++catalogRequest,mode=$('catalog-mode').value,local=mode==='local';
+  $('catalog-summary').textContent=local?'Looking for local videos…':'Reading source catalog…';
+  $('catalog-rows').replaceChildren();
+  const result=await api(`/api/catalog?q=${encodeURIComponent($('search').value)}&mode=${mode}`);
+  if(request!==catalogRequest)return;
+  const item=local?'video':'trial';
+  const matched=`${result.total} matching ${item}${result.total===1?'':'s'}${result.total>100?' · showing first 100':''}. Import creates a local draft.`;
+  $('catalog-summary').textContent=local&&!result.total&&!$('search').value
+    ?'No videos found. Add MP4, MOV or M4V files to the configured local video folder.'
+    :matched;
   $('catalog-rows').replaceChildren(...result.rows.map(row=>{
-    const el=textNode('div','','catalog-row'),info=textNode('div','');info.append(textNode('strong',label(row)),textNode('small',`${row.camera||'Camera'} · ${row.session||''} · shared: ${row.sharedStatus}${row.cached?' · cached source':''}`));
+    const el=textNode('div','','catalog-row'),info=textNode('div','');
+    const details=local?row.session:`${row.camera||'Camera'} · ${row.session||''} · shared: ${row.sharedStatus}${row.cached?' · cached source':''}`;
+    info.append(textNode('strong',label(row)),textNode('small',details));
     const loaded=bootstrap.trials.some(t=>t.id===row.id),b=textNode('button',loaded?'Open draft':'Load local copy');b.disabled=row.sharedStatus==='active'||row.rejected||row.sharedStatus==='rejected';
-    b.onclick=()=>run(async()=>{b.disabled=true;b.textContent='Loading…';try{if(!loaded)await api('/api/import',{id:row.id});await loadBootstrap();await loadTrial(row.id);$('catalog-dialog').close();}finally{b.disabled=false;b.textContent='Open draft';}});el.append(info,b);return el;
+    b.onclick=()=>run(async()=>{b.disabled=true;b.textContent='Loading…';try{if(!loaded)await api('/api/import',{id:row.id});await loadBootstrap();await loadTrial(row.id);$('catalog-dialog').close();}finally{b.disabled=false;b.textContent=loaded?'Open draft':'Load local copy';}});el.append(info,b);return el;
   }));
 }
-function openCatalog(){$('catalog-dialog').showModal();return catalog();}
-$('browse').onclick=$('empty-browse').onclick=()=>run(openCatalog);
+function openCatalog(mode){
+  if(!$('catalog-mode').querySelector(`option[value="${mode}"]`).disabled) $('catalog-mode').value=mode;
+  $('search').value='';
+  $('catalog-dialog').showModal();return catalog();
+}
+$('browse').onclick=$('empty-browse').onclick=()=>run(()=>openCatalog('cached'));
+$('browse-local').onclick=()=>run(()=>openCatalog('local'));
 $('close-catalog').onclick=()=>$('catalog-dialog').close();
 let searchTimer;$('search').oninput=()=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>run(catalog),180);};$('catalog-mode').onchange=()=>run(catalog);
 $('refresh').onclick=()=>run(async()=>{$('refresh').disabled=true;try{await api('/api/refresh',{});await loadBootstrap();toast('Updated the local catalog snapshot from GCS.');}finally{$('refresh').disabled=false;}});

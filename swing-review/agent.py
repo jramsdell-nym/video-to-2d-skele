@@ -13,7 +13,7 @@ def main():
     parser.add_argument('--url', default='http://127.0.0.1:8794')
     commands = parser.add_subparsers(dest='command', required=True)
     commands.add_parser('queue')
-    catalog = commands.add_parser('catalog'); catalog.add_argument('--mode', choices=['cached','available','all'], default='cached')
+    catalog = commands.add_parser('catalog'); catalog.add_argument('--mode', choices=['cached','available','all','local'], default='cached')
     load = commands.add_parser('load'); load.add_argument('trial')
     claim = commands.add_parser('claim'); claim.add_argument('trial'); claim.add_argument('--owner', required=True); claim.add_argument('--session', type=Path, required=True)
     inspect = commands.add_parser('inspect'); inspect.add_argument('trial'); inspect.add_argument('--start', type=int, default=0); inspect.add_argument('--end', type=int); inspect.add_argument('--joint')

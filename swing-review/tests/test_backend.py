@@ -6,7 +6,8 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from backend import ReadOnlyBackend, digest
+from backend import LocalVideoLibrary, ReadOnlyBackend, digest
+from store import Store
 
 
 def write_snapshot(path, value):
@@ -78,6 +79,68 @@ class BackendTests(unittest.TestCase):
         self.assertEqual([c[0] for c in calls], ['objects', 'cp'])
         self.assertTrue(calls[1][1].endswith('#456'))
         self.assertFalse(calls[1][2].startswith('gs://'))
+
+    def test_status_without_cloud_snapshot(self):
+        empty = ReadOnlyBackend(self.root / 'fresh', self.root / 'empty')
+        self.assertIsNone(empty.status()['retrievedAt'])
+        self.assertFalse(empty.status()['uploadEnabled'])
+
+
+class LocalVideoTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.videos = self.root / 'clips'
+        self.videos.mkdir()
+        self.library = LocalVideoLibrary(self.videos, self.root / 'data')
+
+    def test_native_frames_and_idempotent_draft(self):
+        import av
+        from PIL import Image
+
+        group = self.videos / 'Scout swings'
+        group.mkdir()
+        video = group / 'recording.MOV'
+        with av.open(str(video), mode='w') as output:
+            stream = output.add_stream('mpeg4', rate=24)
+            stream.width, stream.height = 96, 64
+            stream.pix_fmt = 'yuv420p'
+            for pts in (0, 1, 4):
+                frame = av.VideoFrame.from_image(Image.new('RGB', (96, 64)))
+                frame.pts = pts
+                output.mux(stream.encode(frame))
+            output.mux(stream.encode())
+        video.with_suffix('.json').write_text('{"private":"unused"}')
+        (group / 'alias.mov').symlink_to(video)
+        [row] = self.library.catalog()
+        self.assertEqual(row['session'], 'Scout swings')
+        self.assertNotIn(str(self.videos), json.dumps(row))
+        asset = self.library.load(row['id'])
+        self.assertEqual(asset['records'], [])
+        self.assertEqual(asset['clip']['sha256'], digest(video))
+        frames = asset['clip']['frames']
+        self.assertEqual([f['index'] for f in frames], [0, 1, 2])
+        self.assertAlmostEqual(frames[-1]['time'], 4 / 24)
+
+        store = Store(self.root / 'data' / 'drafts.sqlite3')
+        self.assertTrue(store.add(asset))
+        self.assertFalse(store.add(self.library.load(row['id'])))
+        video.unlink()
+        self.assertEqual(self.library.catalog(), [])
+        self.assertEqual(digest(asset['video']), asset['clip']['sha256'])
+        self.assertEqual(store.get(row['id'])['state'], 'draft')
+        self.assertEqual(store.get(row['id'])['frames'][0]['record']['status'], 'draft')
+
+    def test_corrupt_media_and_unknown_ids_fail_without_leaving_a_copy(self):
+        source = self.videos / 'broken.mp4'
+        source.write_bytes(b'invalid media')
+        [row] = self.library.catalog()
+        with self.assertRaisesRegex(ValueError, 'Could not decode'):
+            self.library.load(row['id'])
+        self.assertEqual(list(self.library.cache.iterdir()), [])
+        with self.assertRaisesRegex(ValueError, 'missing or changed'):
+            self.library.load('local-nonexistent')
 
 
 if __name__ == '__main__':

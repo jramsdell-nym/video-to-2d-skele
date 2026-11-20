@@ -10,17 +10,18 @@ from pathlib import Path
 import threading
 from urllib.parse import urlparse, parse_qs
 
-from backend import ReadOnlyBackend, ROOT, digest
+from backend import LocalVideoLibrary, ReadOnlyBackend, ROOT, digest
 from store import Store, Conflict, JOINTS, PASSES
 
 
 class Application:
-    def __init__(self, data):
+    def __init__(self, data, videos=None):
         self.data = Path(data)
         self.data.mkdir(parents=True, exist_ok=True)
         self.data.chmod(0o700)
         self.store = Store(self.data / 'drafts.sqlite3')
         self.backend = ReadOnlyBackend(self.data)
+        self.local_videos = LocalVideoLibrary(videos or self.data / 'local-videos', self.data)
         self.locks = defaultdict(threading.Lock)
 
     def frame(self, tid, index):
@@ -97,11 +98,11 @@ class Handler(BaseHTTPRequestHandler):
             if url.path == '/api/bootstrap':
                 return self.send(200, {'trials': self.app.store.list(), 'backend': self.app.backend.status(), 'joints': JOINTS, 'passes': PASSES})
             if url.path == '/api/catalog':
-                rows = self.app.backend.catalog()
+                mode = query.get('mode', ['cached'])[0]
+                rows = self.app.local_videos.catalog() if mode == 'local' else self.app.backend.catalog()
                 term = query.get('q', [''])[0].lower()
                 if term:
                     rows = [r for r in rows if term in json.dumps({k: r.get(k) for k in ('id', 'trial', 'session', 'camera')}).lower()]
-                mode = query.get('mode', ['cached'])[0]
                 if mode == 'cached':
                     rows = [r for r in rows if r['cached']]
                 elif mode == 'available':
@@ -136,11 +137,15 @@ class Handler(BaseHTTPRequestHandler):
             if parts == ['api', 'refresh']:
                 return self.send(200, self.app.backend.refresh())
             if parts == ['api', 'import']:
+                trial_id = body['id']
+                if not isinstance(trial_id, str):
+                    raise ValueError('Invalid trial ID')
+                source = self.app.local_videos if trial_id.startswith('local-') else self.app.backend
                 with self.app.locks['import']:
                     existing = {t['id'] for t in self.app.store.list()}
-                    if body['id'] not in existing:
-                        self.app.store.add(self.app.backend.load(body['id']))
-                return self.send(200, self.app.store.get(body['id']))
+                    if trial_id not in existing:
+                        self.app.store.add(source.load(trial_id))
+                return self.send(200, self.app.store.get(trial_id))
             if len(parts) == 4 and parts[:2] == ['api', 'trials']:
                 if parts[3] == 'claim':
                     return self.send(200, self.app.store.claim(parts[2], body))
@@ -169,9 +174,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, default=8794)
     parser.add_argument('--data', type=Path, default=ROOT / 'data')
+    parser.add_argument('--videos', type=Path, help='Local video folder (defaults to local-videos under --data)')
     args = parser.parse_args()
     server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
-    server.app = Application(args.data)
+    server.app = Application(args.data, args.videos)
     print(f'Swing Review: http://127.0.0.1:{server.server_port}/ | local drafts: {args.data}', flush=True)
     try:
         server.serve_forever()
