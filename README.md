@@ -95,8 +95,8 @@ lists MP4, MOV, and M4V files in the folder and its subfolders. If you omit
 `--videos`, the picker uses `local-videos` under the Swing Review data directory.
 
 Select **Load local copy** to save the original clip and start a draft with its
-native frame timestamps. The picker accepts clips up to 128 MiB and 3,600
-frames. It imports footage only. Source annotations stay in their original
+native frame timestamps. The picker accepts clips up to 3,600 frames.
+It imports footage only. Source annotations stay in their original
 files. Drafts and copied clips are stored in `swing-review/data/` by default.
 Use `--data` to reopen an existing Swing Review workspace.
 

@@ -100,8 +100,8 @@ class LocalVideoLibrary:
                 break
         else:
             raise ValueError('Local video is missing or changed. Reopen the video picker.')
-        if not 0 < stat.st_size <= MAX_VIDEO_BYTES:
-            raise ValueError('Local videos must be between 1 byte and 128 MiB')
+        if stat.st_size == 0:
+            raise ValueError('The local video is empty')
         self.cache.mkdir(parents=True, exist_ok=True, mode=0o700)
         with TemporaryDirectory(dir=self.cache) as staging:
             copy = Path(staging) / ('source' + path.suffix.lower())
